@@ -1,0 +1,70 @@
+{
+  "name": "@fourlabsofficial/polymarket-mcp",
+  "version": "0.1.0",
+  "description": "One-click Polymarket MCP connector. OAuth 2.0 + auto-trading + real-time market data for Claude, Cursor, OpenAI, Hermes, Cline.",
+  "type": "module",
+  "main": "dist/server.js",
+  "bin": {
+    "polymarket-mcp": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "manifest.json",
+    "icon.png"
+  ],
+  "scripts": {
+    "build": "tsc && shx chmod +x dist/server.js dist/cli.js",
+    "dev": "tsx watch src/server.ts",
+    "start": "node --enable-source-maps dist/server.js",
+    "start:http": "node --enable-source-maps dist/server.js --transport=http --port=7842",
+    "install:claude": "node dist/cli.js install claude",
+    "install:claude-code": "node dist/cli.js install claude-code",
+    "install:cursor": "node dist/cli.js install cursor",
+    "install:openai": "node dist/cli.js install openai",
+    "install:hermes": "node dist/cli.js install hermes",
+    "install:cline": "node dist/cli.js install cline",
+    "install:all": "node dist/cli.js install all"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "polymarket",
+    "v2",
+    "clob",
+    "prediction-markets",
+    "trading",
+    "oauth2",
+    "pkce",
+    "one-click",
+    "claude",
+    "cursor",
+    "openai",
+    "auto-trading"
+  ],
+  "author": "fourlabsofficial",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fourlabsofficial/polymarket-mcp.git"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@polymarket/clob-client-v2": "latest",
+    "@polymarket/builder-relayer-client": "latest",
+    "@polymarket/builder-signing-sdk": "latest",
+    "fastmcp": "^3.35.0",
+    "viem": "^2.21.0",
+    "ws": "^8.18.0",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.12.4",
+    "@types/ws": "^8.5.13",
+    "shx": "^0.3.4",
+    "tsx": "^4.22.0",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "manifest_version": "0.2",
+  "name": "polymarket-mcp",
+  "display_name": "Polymarket",
+  "version": "0.1.0",
+  "description": "Polymarket prediction market — search, trade, manage positions, and run auto-trading strategies. No private key handling: uses OAuth 2.0 with browser-based authentication.",
+  "author": {
+    "name": "fourlabsofficial"
+  },
+  "homepage": "https://github.com/fourlabsofficial/polymarket-mcp",
+  "license": "MIT",
+  "keywords": [
+    "polymarket",
+    "prediction-markets",
+    "trading",
+    "mcp"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/server.js",
+    "mcp_config": {
+      "command": "node",
+      "args": [
+        "--enable-source-maps",
+        "dist/server.js",
+        "--transport=http",
+        "--port=7842"
+      ]
+    }
+  },
+  "user_config": {
+    "polymarket_oauth": {
+      "type": "object",
+      "title": "Polymarket Authentication",
+      "description": "Click 'Connect' to authenticate via OAuth 2.0 in your browser. No private keys or API credentials are stored locally — Polymarket issues short-lived access tokens.",
+      "properties": {}
+    }
+  },
+  "oauth": {
+    "required": true,
+    "provider": "polymarket",
+    "authorization_url": "http://localhost:7842/oauth/authorize",
+    "token_url": "http://localhost:7842/oauth/token",
+    "scopes": [
+      "read:markets",
+      "read:positions",
+      "write:orders",
+      "read:trades"
+    ]
+  },
+  "tools": [
+    { "name": "polymarket_search", "description": "Search markets by keyword" },
+    { "name": "polymarket_orderbook", "description": "Get live orderbook for a token" },
+    { "name": "polymarket_place_order", "description": "Place limit or market order" },
+    { "name": "polymarket_positions", "description": "Get open positions" },
+    { "name": "polymarket_strategies", "description": "Run auto-trading strategies" }
+  ]
+}

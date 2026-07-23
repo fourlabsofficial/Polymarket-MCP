@@ -1,0 +1,21 @@
+node_modules/
+dist/
+*.log
+*.tsbuildinfo
+.DS_Store
+
+# Secrets — NEVER commit. Use OAuth flow.
+.env
+.env.local
+.env.*.local
+*.secret
+*.key
+polymarket-secrets*
+.token-cache
+.oauth-tokens.json
+trade-log.jsonl
+
+# Build artifacts
+*.d.ts
+*.d.ts.map
+*.js.map
