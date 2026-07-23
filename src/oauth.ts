@@ -148,8 +148,21 @@ export class OauthServer {
   // ─── Authorization endpoint ───
   async handleAuthorize(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const url = parseUrl(req.url || "", true);
-    const params = url.query as Record<string, string>;
-    const { response_type, client_id, redirect_uri, code_challenge, code_challenge_method, state, scope = "read:markets write:orders" } = params;
+    const queryParams = url.query as Record<string, string>;
+    let bodyParams: Record<string, string> = {};
+    if (req.method === "POST") {
+      const body = await readBody(req);
+      bodyParams = parseFormBody(body);
+    }
+    const params = { ...queryParams, ...bodyParams };
+    const { response_type, client_id, redirect_uri, code_challenge, code_challenge_method, state, scope = "read:markets write:orders", action } = params;
+
+    // POST with action → handle form submit
+    if (req.method === "POST" && action) {
+      // bodyParams is the already-parsed form; pass to handler along with req
+      await this.handleLoginSubmitBody(req, new URLSearchParams(params).toString(), res);
+      return;
+    }
 
     if (response_type !== "code") {
       this.errorRedirect(res, redirect_uri, "unsupported_response_type", state);
@@ -197,6 +210,10 @@ export class OauthServer {
 
   async handleLoginSubmit(req: IncomingMessage, res: ServerResponse): Promise<void> {
     const body = await readBody(req);
+    await this.handleLoginSubmitBody(req, body, res);
+  }
+
+  async handleLoginSubmitBody(req: IncomingMessage, body: string, res: ServerResponse): Promise<void> {
     const form = parseFormBody(body);
     const { client_id, redirect_uri, scope, code_challenge, code_challenge_method, state, action } = form;
 
@@ -235,6 +252,33 @@ export class OauthServer {
       this.persist();
       const sep = redirect_uri.includes("?") ? "&" : "?";
       res.writeHead(302, { Location: `${redirect_uri}${sep}code=${code}&state=${encodeURIComponent(state || "")}` });
+      res.end();
+      return;
+    }
+
+    // LOCAL TEST MODE: simulate successful Polymarket login + consent in one step
+    // Use only for local testing — production uses real Polymarket OAuth callback
+    if (action === "dev_approve") {
+      const code = randomBytes(24).toString("base64url");
+      const testUser = "test-user-" + (client_id ?? "").slice(0, 8);
+      this.codes.set(code, {
+        code, client_id: client_id ?? "", redirect_uri, scope, code_challenge, code_challenge_method,
+        state, user_id: testUser, polymarket_token: "local-test-pm-token",
+        created_at: Date.now(),
+      });
+      // Store fake L2 credentials for local testing
+      this.userCredentials.set(testUser, {
+        apiKey: "local-test-api-key-" + testUser,
+        secret: "local-test-secret-" + testUser,
+        passphrase: "local-test-passphrase-" + testUser,
+        address: "0xtest" + testUser.slice(-36).padStart(40, "0"),
+      });
+      this.persist();
+      const sep = redirect_uri.includes("?") ? "&" : "?";
+      res.writeHead(302, {
+        Location: `${redirect_uri}${sep}code=${code}&state=${encodeURIComponent(state || "")}`,
+        "Set-Cookie": `polymarket_session=${testUser}; Path=/; HttpOnly`,
+      });
       res.end();
       return;
     }

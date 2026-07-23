@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "One-click Polymarket MCP connector. OAuth 2.0 + auto-trading + real-time market data for Claude, Cursor, OpenAI, Hermes, Cline.",
   "type": "module",
-  "main": "dist/server.js",
+  "main": "dist/server-entry.js",
   "bin": {
     "polymarket-mcp": "dist/cli.js"
   },
